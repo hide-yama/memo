@@ -12,10 +12,10 @@ const notoSansJP = Noto_Sans_JP({
 
 export const metadata: Metadata = {
   title: {
-    default: "My Blog",
-    template: "%s | My Blog",
+    default: "memo",
+    template: "%s | memo",
   },
-  description: "個人ブログサイト",
+  description: "書いて、残して、伝える場所",
 };
 
 export default function RootLayout({

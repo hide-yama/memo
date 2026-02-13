@@ -5,7 +5,7 @@ export default function Header() {
     <header className="sticky top-0 z-50 border-b bg-white" style={{ borderColor: "var(--color-border)" }}>
       <div className="mx-auto flex h-14 max-w-4xl items-center justify-between px-4">
         <Link href="/" className="text-xl font-semibold tracking-tight" style={{ color: "var(--color-text)" }}>
-          My Blog
+          memo
         </Link>
         <nav className="flex items-center gap-5 text-sm" style={{ color: "var(--color-text-secondary)" }}>
           <Link href="/" className="transition-colors hover:text-[var(--color-text)]">
