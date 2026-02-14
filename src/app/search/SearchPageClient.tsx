@@ -58,7 +58,7 @@ export default function SearchPageClient({ posts }: { posts: PostMeta[] }) {
             「{query}」に一致する記事が見つかりませんでした
           </p>
         ) : (
-          <div className="grid grid-cols-2 gap-3 sm:gap-4">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
             {filtered.map((post) => (
               <PostCard key={post.slug} post={post} />
             ))}

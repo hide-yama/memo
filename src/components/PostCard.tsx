@@ -19,7 +19,7 @@ export default function PostCard({ post }: { post: PostMeta }) {
     >
       <Link href={`/posts/${post.slug}`} className="block">
         {/* サムネイル */}
-        <div className="aspect-[16/9] overflow-hidden bg-[#f0f2f4]">
+        <div className="aspect-[3/2] overflow-hidden bg-[#f0f2f4]">
           {post.thumbnail ? (
             <Image
               src={post.thumbnail}
@@ -40,7 +40,7 @@ export default function PostCard({ post }: { post: PostMeta }) {
         {/* コンテンツ */}
         <div className="p-3 sm:p-4">
           <h2
-            className="line-clamp-2 text-sm font-semibold leading-snug sm:text-base"
+            className="text-sm font-semibold leading-snug sm:text-base"
             style={{ color: "var(--color-text)" }}
           >
             {post.title}
