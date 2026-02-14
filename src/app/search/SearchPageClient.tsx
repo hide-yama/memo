@@ -13,7 +13,8 @@ export default function SearchPageClient({ posts }: { posts: PostMeta[] }) {
         return (
           post.title.toLowerCase().includes(q) ||
           post.description.toLowerCase().includes(q) ||
-          post.tags.some((tag) => tag.toLowerCase().includes(q))
+          post.tags.some((tag) => tag.toLowerCase().includes(q)) ||
+          post.category.toLowerCase().includes(q)
         );
       })
     : [];
@@ -57,7 +58,7 @@ export default function SearchPageClient({ posts }: { posts: PostMeta[] }) {
             「{query}」に一致する記事が見つかりませんでした
           </p>
         ) : (
-          <div className="grid gap-4">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4">
             {filtered.map((post) => (
               <PostCard key={post.slug} post={post} />
             ))}

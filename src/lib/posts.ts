@@ -3,6 +3,18 @@ import path from "path";
 import matter from "gray-matter";
 
 const postsDirectory = path.join(process.cwd(), "content/posts");
+const imagesDirectory = path.join(process.cwd(), "public/images/posts");
+
+const imageExtensions = [".png", ".jpg", ".jpeg", ".webp"];
+
+function findThumbnail(slug: string): string | null {
+  for (const ext of imageExtensions) {
+    if (fs.existsSync(path.join(imagesDirectory, `${slug}${ext}`))) {
+      return `/images/posts/${slug}${ext}`;
+    }
+  }
+  return null;
+}
 
 export type PostMeta = {
   slug: string;
@@ -10,6 +22,8 @@ export type PostMeta = {
   date: string;
   description: string;
   tags: string[];
+  category: string;
+  thumbnail: string | null;
   published: boolean;
 };
 
@@ -34,10 +48,13 @@ export function getAllPosts(): PostMeta[] {
         date: data.date ?? "",
         description: data.description ?? "",
         tags: data.tags ?? [],
+        category: data.category ?? "",
+        thumbnail: findThumbnail(slug),
         published: data.published ?? false,
       } satisfies PostMeta;
     })
     .filter((post) => post.published)
+    .filter((post) => new Date(post.date) <= new Date())
     .sort((a, b) => (a.date > b.date ? -1 : 1));
 
   return posts;
@@ -57,6 +74,8 @@ export function getPostBySlug(slug: string): Post | null {
     date: data.date ?? "",
     description: data.description ?? "",
     tags: data.tags ?? [],
+    category: data.category ?? "",
+    thumbnail: findThumbnail(slug),
     published: data.published ?? false,
     content,
   };
@@ -71,4 +90,17 @@ export function getAllTags(): string[] {
 
 export function getPostsByTag(tag: string): PostMeta[] {
   return getAllPosts().filter((post) => post.tags.includes(tag));
+}
+
+export function getAllCategories(): string[] {
+  const posts = getAllPosts();
+  const categorySet = new Set<string>();
+  posts.forEach((post) => {
+    if (post.category) categorySet.add(post.category);
+  });
+  return Array.from(categorySet).sort();
+}
+
+export function getPostsByCategory(category: string): PostMeta[] {
+  return getAllPosts().filter((post) => post.category === category);
 }
