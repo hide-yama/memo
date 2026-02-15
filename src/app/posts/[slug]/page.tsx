@@ -60,7 +60,7 @@ export default async function PostPage({ params }: Props) {
         )}
         <div className="p-6 sm:p-10">
         <header className="mb-8">
-          <h1 className="text-2xl font-semibold leading-tight sm:text-3xl" style={{ color: "var(--color-text)" }}>
+          <h1 className="text-xl font-semibold leading-tight sm:text-2xl" style={{ color: "var(--color-text)" }}>
             {post.title}
           </h1>
           <time className="mt-3 block text-sm" style={{ color: "var(--color-text-tertiary)" }}>
