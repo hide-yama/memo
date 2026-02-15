@@ -4,8 +4,14 @@ import { useState } from "react";
 import type { PostMeta } from "@/lib/posts";
 import PostCard from "@/components/PostCard";
 
-export default function SearchPageClient({ posts }: { posts: PostMeta[] }) {
-  const [query, setQuery] = useState("");
+export default function SearchPageClient({
+  posts,
+  initialQuery = "",
+}: {
+  posts: PostMeta[];
+  initialQuery?: string;
+}) {
+  const [query, setQuery] = useState(initialQuery);
 
   const filtered = query.trim()
     ? posts.filter((post) => {

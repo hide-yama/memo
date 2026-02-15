@@ -11,11 +11,24 @@ const notoSansJP = Noto_Sans_JP({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://memo-umber-five.vercel.app"),
   title: {
     default: "memo",
     template: "%s | memo",
   },
   description: "書いて、残して、伝える場所",
+  openGraph: {
+    type: "website",
+    locale: "ja_JP",
+    siteName: "memo",
+  },
+  twitter: {
+    card: "summary_large_image",
+  },
+  alternates: {
+    canonical: "./",
+    types: { "application/rss+xml": "/feed.xml" },
+  },
 };
 
 export default function RootLayout({

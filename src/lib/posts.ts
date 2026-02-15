@@ -7,6 +7,10 @@ const imagesDirectory = path.join(process.cwd(), "public/images/posts");
 
 const imageExtensions = [".png", ".jpg", ".jpeg", ".webp"];
 
+function calcReadingTime(text: string): number {
+  return Math.max(1, Math.round(text.length / 500));
+}
+
 function findThumbnail(slug: string): string | null {
   for (const ext of imageExtensions) {
     if (fs.existsSync(path.join(imagesDirectory, `${slug}${ext}`))) {
@@ -25,6 +29,7 @@ export type PostMeta = {
   category: string;
   thumbnail: string | null;
   published: boolean;
+  readingTime: number;
 };
 
 export type Post = PostMeta & {
@@ -40,7 +45,7 @@ export function getAllPosts(): PostMeta[] {
       const slug = file.replace(/\.md$/, "");
       const filePath = path.join(postsDirectory, file);
       const fileContents = fs.readFileSync(filePath, "utf8");
-      const { data } = matter(fileContents);
+      const { data, content } = matter(fileContents);
 
       return {
         slug,
@@ -51,6 +56,7 @@ export function getAllPosts(): PostMeta[] {
         category: data.category ?? "",
         thumbnail: findThumbnail(slug),
         published: data.published ?? false,
+        readingTime: calcReadingTime(content),
       } satisfies PostMeta;
     })
     .filter((post) => post.published)
@@ -77,6 +83,7 @@ export function getPostBySlug(slug: string): Post | null {
     category: data.category ?? "",
     thumbnail: findThumbnail(slug),
     published: data.published ?? false,
+    readingTime: calcReadingTime(content),
     content,
   };
 }
@@ -114,7 +121,7 @@ export function getAllPostsIncludingScheduled(): PostMeta[] {
       const slug = file.replace(/\.md$/, "");
       const filePath = path.join(postsDirectory, file);
       const fileContents = fs.readFileSync(filePath, "utf8");
-      const { data } = matter(fileContents);
+      const { data, content } = matter(fileContents);
 
       return {
         slug,
@@ -125,8 +132,32 @@ export function getAllPostsIncludingScheduled(): PostMeta[] {
         category: data.category ?? "",
         thumbnail: findThumbnail(slug),
         published: data.published ?? false,
+        readingTime: calcReadingTime(content),
       } satisfies PostMeta;
     })
     .filter((post) => post.published)
     .sort((a, b) => (a.date > b.date ? -1 : 1));
+}
+
+export function getAdjacentPosts(slug: string): { prev: PostMeta | null; next: PostMeta | null } {
+  const posts = getAllPosts();
+  const index = posts.findIndex((p) => p.slug === slug);
+  if (index === -1) return { prev: null, next: null };
+  return {
+    prev: index > 0 ? posts[index - 1] : null,
+    next: index < posts.length - 1 ? posts[index + 1] : null,
+  };
+}
+
+export function getRelatedPosts(slug: string, tags: string[], limit = 2): PostMeta[] {
+  const posts = getAllPosts().filter((p) => p.slug !== slug);
+  return posts
+    .map((post) => ({
+      post,
+      score: post.tags.filter((t) => tags.includes(t)).length,
+    }))
+    .filter((item) => item.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit)
+    .map((item) => item.post);
 }

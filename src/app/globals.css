@@ -66,6 +66,12 @@ body {
   border-radius: 0.375rem;
 }
 
+/* 右端フェードマスク */
+.mask-fade-right {
+  mask-image: linear-gradient(to right, black 85%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+}
+
 /* 横スクロールバー非表示 */
 .scrollbar-none {
   -ms-overflow-style: none;

@@ -55,6 +55,9 @@ export default function PostCard({ post }: { post: PostMeta }) {
             <time className="text-[11px] sm:text-xs" style={{ color: "var(--color-text-tertiary)" }}>
               {formatDate(post.date)}
             </time>
+            <span className="text-[11px] sm:text-xs" style={{ color: "var(--color-text-tertiary)" }}>
+              {post.readingTime}分
+            </span>
             {post.category && (
               <span
                 className="text-[11px] font-medium sm:text-xs"
