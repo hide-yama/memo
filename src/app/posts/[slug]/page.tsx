@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import { getAllPosts, getPostBySlug } from "@/lib/posts";
 import { markdownToHtml } from "@/lib/markdownToHtml";
 import TagList from "@/components/TagList";
@@ -44,7 +45,20 @@ export default async function PostPage({ params }: Props) {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10">
-      <article className="rounded-lg border bg-white p-6 sm:p-10" style={{ borderColor: "var(--color-border)" }}>
+      <article className="overflow-hidden rounded-lg border bg-white" style={{ borderColor: "var(--color-border)" }}>
+        {post.thumbnail && (
+          <div className="aspect-[3/2] overflow-hidden">
+            <Image
+              src={post.thumbnail}
+              alt=""
+              width={1536}
+              height={1024}
+              className="h-full w-full object-cover"
+              priority
+            />
+          </div>
+        )}
+        <div className="p-6 sm:p-10">
         <header className="mb-8">
           <h1 className="text-2xl font-semibold leading-tight sm:text-3xl" style={{ color: "var(--color-text)" }}>
             {post.title}
@@ -62,6 +76,7 @@ export default async function PostPage({ params }: Props) {
         <footer className="mt-12 border-t pt-6" style={{ borderColor: "var(--color-border)" }}>
           <TagList tags={post.tags} />
         </footer>
+        </div>
       </article>
     </div>
   );

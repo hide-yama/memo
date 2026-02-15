@@ -15,5 +15,10 @@ export async function markdownToHtml(markdown: string): Promise<string> {
     .use(rehypeStringify)
     .process(markdown);
 
-  return result.toString();
+  // 話者名（**名前：**）の後に改行を挿入
+  const html = result
+    .toString()
+    .replace(/<strong>([^<]+[：:])<\/strong>\s*/g, "<strong>$1</strong><br>");
+
+  return html;
 }

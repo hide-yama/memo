@@ -22,7 +22,7 @@ body {
   --tw-prose-headings: var(--color-text);
   --tw-prose-links: var(--color-accent);
   --tw-prose-code: var(--color-text);
-  font-size: 1.125rem;
+  font-size: 0.9375rem;
   line-height: 1.8;
 }
 
