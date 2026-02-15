@@ -16,32 +16,43 @@ noteライクなミニマルデザイン。「無色透明で邪魔にならな�
 - アクセント: `#1e7b65`（ティールグリーン）
 
 ### タイポグラフィ
-- 本文: 約18px、1行約35文字、行間1.5倍
+- 本文: 約15px（0.9375rem）、行間1.8倍
 - ウェイト: 400（通常）と 600（ボールド）
 
 ### レイアウト
 - 記事本文幅: max-w-2xl（約640px）
 - 全体幅: max-w-4xl
+- 記事一覧: スマホ1カラム / デスクトップ(sm以上)2カラム
+- サムネイル比率: 3:2（1536x1024px）
 - 十分な余白で読みやすさを重視
 
 ## ディレクトリ構成
 ```
 content/posts/           # Markdown記事ファイル
-public/images/posts/     # 記事用画像
+public/images/posts/     # 記事用サムネイル画像（{slug}.png）
 src/
 ├── app/
 │   ├── layout.tsx       # ルートレイアウト
 │   ├── page.tsx         # ホームページ（記事一覧）
 │   ├── globals.css      # Tailwind設定
-│   ├── posts/[slug]/page.tsx    # 記事詳細
-│   ├── tags/[tag]/page.tsx      # タグ別一覧
-│   └── search/
-│       ├── page.tsx             # 検索ページ（サーバー）
-│       └── SearchPageClient.tsx # 検索UI（クライアント）
-├── components/          # 共通コンポーネント
+│   ├── posts/[slug]/page.tsx          # 記事詳細
+│   ├── categories/[category]/page.tsx # カテゴリ別一覧
+│   ├── tags/[tag]/page.tsx            # タグ別一覧
+│   ├── search/
+│   │   ├── page.tsx             # 検索ページ（サーバー）
+│   │   └── SearchPageClient.tsx # 検索UI（クライアント）
+│   ├── preview/page.tsx         # プレビューページ（パスワード認証）
+│   └── api/
+│       ├── revalidate/route.ts  # Vercel cron用リビルドAPI
+│       └── preview/route.ts     # プレビュー認証API
+├── components/
+│   ├── PostCard.tsx      # 記事カード（サムネイル付き）
+│   ├── PostList.tsx      # 記事一覧グリッド
+│   ├── CategoryList.tsx  # カテゴリナビゲーション
+│   └── TagList.tsx       # タグナビゲーション（横スクロール）
 └── lib/
-    ├── posts.ts         # 記事読み込み・クエリ
-    └── markdownToHtml.ts # Markdown→HTML変換
+    ├── posts.ts          # 記事読み込み・クエリ
+    └── markdownToHtml.ts # Markdown→HTML変換（話者名後の改行処理含む）
 ```
 
 ## 記事フォーマット（frontmatter）
@@ -49,9 +60,42 @@ src/
 title: "記事タイトル"
 date: "2026-02-13"
 description: "記事の概要"
-tags: ["Next.js", "TypeScript"]
+tags: ["節約", "家計管理"]
+category: "暮らしとお金"
 published: true
 ```
+
+## 命名規則
+- 記事ファイル名 = slug（英語、ケバブケース）例: `interest-rate-is-not-meat.md`
+- サムネイル画像は `public/images/posts/{slug}.png` に配置で自動検出
+- スラッグは一度決めたら変更しない（URLの安定性のため）
+
+## 機能一覧
+
+### カテゴリ分け
+- frontmatterの `category` フィールドで大分類
+- タグ = 記事内の細かい分類、カテゴリ = ジャンルの大分類
+- `/categories/{category}` でカテゴリ別一覧
+
+### 公開日スケジューリング
+- `date` が未来の記事はビルド時に自動で非表示
+- Vercel cronで毎日 JST 0:00（UTC 15:00）にリビルド
+- `vercel.json` で設定済み
+
+### プレビューモード
+- `/preview` でパスワード認証後、未来記事を含む全記事を表示
+- 未来記事には「公開予定」バッジ表示
+- パスワードは環境変数 `PREVIEW_PASSWORD` で設定（デフォルト: `preview`）
+- Vercelにも `PREVIEW_PASSWORD` 環境変数の設定が必要
+
+### サムネイル
+- `public/images/posts/{slug}.{png,jpg,jpeg,webp}` を自動検出
+- 画像がない記事はグレー背景に薄い「memo」テキストのプレースホルダー
+- 記事一覧カード・記事詳細ページ両方に表示
+
+### 話者名の改行処理
+- Markdown内の `**名前：**` パターンの後に自動で改行を挿入
+- `markdownToHtml.ts` で処理
 
 ## コマンド
 - `npm run dev` - 開発サーバー起動
@@ -62,5 +106,20 @@ published: true
 ## 注意事項
 - 記事は `content/posts/` にMarkdownファイルとして配置（ファイル名がslugになる）
 - `published: false` の記事は一覧に表示されない
-- 検索はクライアントサイドフィルタリング（タイトル・説明・タグを対象）
+- 検索はクライアントサイドフィルタリング（タイトル・説明・タグ・カテゴリを対象）
 - **日本語パスの制約**: プロジェクトディレクトリが日本語パスにあるため、Turbopack（Next.js 16デフォルト）は使用不可。Next.js 15（Webpack）を使用すること
+- **ビルドキャッシュ**: 新しいページやAPIルートを追加した後にランタイムエラーが出る場合は `.next` を削除して再起動
+
+---
+
+## 更新履歴
+
+### 2026-02-15
+- **カテゴリ分け機能**: frontmatterに `category` フィールド追加、カテゴリ別ページ・ナビゲーション作成
+- **公開日スケジューリング**: 未来日付の記事を自動非表示、Vercel cronで毎日リビルド
+- **サムネイル付きカードレイアウト**: PostCardをサムネイル上・タイトル下のカード型に変更、画像未設定時のmemoプレースホルダー
+- **レスポンシブ調整**: スマホ1カラム / デスクトップ2カラム、サムネイル比率3:2
+- **タグUI改善**: 横スクロール化、先頭に「すべて」ボタン追加
+- **記事詳細ページ改善**: サムネイル表示、本文フォント縮小（18px→15px）、タイトル文字サイズ縮小、話者名後の改行処理
+- **プレビューモード**: `/preview` でパスワード認証後に未来記事を含む全記事表示
+- **タグページバグ修正**: 日本語タグのURLデコード処理追加

@@ -104,3 +104,29 @@ export function getAllCategories(): string[] {
 export function getPostsByCategory(category: string): PostMeta[] {
   return getAllPosts().filter((post) => post.category === category);
 }
+
+export function getAllPostsIncludingScheduled(): PostMeta[] {
+  const files = fs.readdirSync(postsDirectory);
+
+  return files
+    .filter((file) => file.endsWith(".md"))
+    .map((file) => {
+      const slug = file.replace(/\.md$/, "");
+      const filePath = path.join(postsDirectory, file);
+      const fileContents = fs.readFileSync(filePath, "utf8");
+      const { data } = matter(fileContents);
+
+      return {
+        slug,
+        title: data.title ?? "",
+        date: data.date ?? "",
+        description: data.description ?? "",
+        tags: data.tags ?? [],
+        category: data.category ?? "",
+        thumbnail: findThumbnail(slug),
+        published: data.published ?? false,
+      } satisfies PostMeta;
+    })
+    .filter((post) => post.published)
+    .sort((a, b) => (a.date > b.date ? -1 : 1));
+}
