@@ -1,14 +1,30 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 export default function HeaderSearchBox() {
-  const [query, setQuery] = useState("");
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-  function handleSubmit(e: React.FormEvent) {
+  // /search ページにいるときはURLの ?q= を初期値にする
+  const urlQuery = pathname === "/search" ? (searchParams.get("q") ?? "") : "";
+  const [query, setQuery] = useState(urlQuery);
+
+  // URLが変わったら同期（検索ページ→他ページの遷移時にクリア等）
+  const [prevUrl, setPrevUrl] = useState(pathname + searchParams.toString());
+  const currentUrl = pathname + searchParams.toString();
+  if (currentUrl !== prevUrl) {
+    setPrevUrl(currentUrl);
+    setQuery(pathname === "/search" ? (searchParams.get("q") ?? "") : "");
+  }
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    // キーボードを閉じる
+    const input = e.currentTarget.querySelector("input");
+    input?.blur();
     const q = query.trim();
     if (q) {
       router.push(`/search?q=${encodeURIComponent(q)}`);
@@ -40,7 +56,7 @@ export default function HeaderSearchBox() {
           placeholder="キーワードで検索"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="w-full rounded-full border bg-[var(--color-bg-secondary)] py-2 pl-9 pr-4 text-sm outline-none transition-colors focus:border-[var(--color-accent)] focus:bg-white"
+          className="w-full rounded-full border bg-[var(--color-bg-secondary)] py-2 pl-9 pr-4 text-base sm:text-sm outline-none transition-colors focus:border-[var(--color-accent)] focus:bg-white"
           style={{ borderColor: "var(--color-border)" }}
         />
       </div>

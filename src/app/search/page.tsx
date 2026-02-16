@@ -1,4 +1,4 @@
-import { getAllPosts } from "@/lib/posts";
+import { getAllPosts, getPostBySlug } from "@/lib/posts";
 import SearchPageClient from "./SearchPageClient";
 import type { Metadata } from "next";
 
@@ -14,12 +14,14 @@ export default async function SearchPage({
   const posts = getAllPosts();
   const { q } = await searchParams;
 
+  const postsWithContent = posts.map((post) => {
+    const full = getPostBySlug(post.slug);
+    return { ...post, content: full?.content ?? "" };
+  });
+
   return (
     <div className="mx-auto max-w-4xl px-4 py-10">
-      <h1 className="mb-6 text-xl font-semibold" style={{ color: "var(--color-text)" }}>
-        記事を検索
-      </h1>
-      <SearchPageClient posts={posts} initialQuery={q ?? ""} />
+      <SearchPageClient posts={postsWithContent} initialQuery={q ?? ""} />
     </div>
   );
 }

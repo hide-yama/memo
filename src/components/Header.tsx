@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import HeaderSearchBox from "./HeaderSearchBox";
 
@@ -8,7 +9,9 @@ export default function Header() {
         <Link href="/" className="shrink-0 text-xl font-semibold tracking-tight" style={{ color: "var(--color-text)" }}>
           memo
         </Link>
-        <HeaderSearchBox />
+        <Suspense>
+          <HeaderSearchBox />
+        </Suspense>
         <nav className="flex shrink-0 items-center gap-5 text-sm" style={{ color: "var(--color-text-secondary)" }}>
           <Link href="/" className="hidden sm:block transition-colors hover:text-[var(--color-text)]">
             ホーム
