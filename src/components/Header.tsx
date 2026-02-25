@@ -12,14 +12,9 @@ export default function Header() {
         <Suspense>
           <HeaderSearchBox />
         </Suspense>
-        <nav className="flex shrink-0 items-center gap-5 text-sm" style={{ color: "var(--color-text-secondary)" }}>
-          <Link href="/" className="hidden sm:block transition-colors hover:text-[var(--color-text)]">
-            ホーム
-          </Link>
-          <Link href="/search" className="hidden sm:block transition-colors hover:text-[var(--color-text)]">
-            検索
-          </Link>
-        </nav>
+        <Link href="/" className="hidden shrink-0 sm:block text-sm transition-colors hover:text-[var(--color-text)]" style={{ color: "var(--color-text-secondary)" }}>
+          ホーム
+        </Link>
       </div>
     </header>
   );
